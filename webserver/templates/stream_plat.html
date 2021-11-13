@@ -1,1 +1,19 @@
-Streaming Platforms
+<html>
+    <style>
+    body{ 
+        font-size: 15pt;
+        font-family: arial;
+    }
+    </style>
+
+
+    <body>
+    <h1>{{stream}}</h1>
+    <div>Details of movies</div>
+    <div>
+        {% for n in data %}
+        <div>{{n}}</div>
+        {% endfor %}
+    </div>
+    </body>
+</html>

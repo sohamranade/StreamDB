@@ -110,11 +110,11 @@ def index():
   #
   # example of a database query
   #
-  cursor = g.conn.execute("SELECT name FROM test")
-  names = []
-  for result in cursor:
-    names.append(result['name'])  # can also be accessed using result[0]
-  cursor.close()
+  #cursor = g.conn.execute("SELECT s.name, s.subscription_cost FROM streamingplatform WHERE s.name=name")
+  #names = []
+  #for result in cursor:
+  #  names.append(result['name'])  # can also be accessed using result[0]
+  #cursor.close()
 
   #
   # Flask uses Jinja templates, which is an extension to HTML where you can
@@ -142,14 +142,14 @@ def index():
   #     <div>{{n}}</div>
   #     {% endfor %}
   #
-  context = dict(data = names)
+  #context = dict(data = names)
 
 
   #
   # render_template looks in the templates/ folder for files.
   # for example, the below file reads template/index.html
   #
-  return render_template("index.html", **context)
+  return render_template("index.html")
 
 #
 # This is an example of a different path.  You can see it at:
@@ -162,8 +162,12 @@ def index():
 
 @app.route('/stream_plat/<name>')
 def stream_plat(name):
-
-  return render_template("stream_plat.html")
+  cursor = g.conn.execute("SELECT e.name,e.genre, e.language,e.description FROM streamingplatform s, ison i,entertainment e WHERE s.name=%s AND s.name=i.name AND i.e_id=e.e_id",name)
+  entertainment=[]
+  for result in cursor:
+    entertainment.append(result)
+  context= dict(data=entertainment,stream=name)
+  return render_template("stream_plat.html", **context)
 
 @app.route('/movie/<name>')
 def movie(name):
@@ -175,7 +179,12 @@ def artist(name):
 
 @app.route('/tv_show/<name>')
 def tv_show(name):
-  return render_template("tv_show.html")
+  cursor = g.conn.execute("SELECT DISTINCT e.name,e.genre, e.language,e.description, c.first_name,c.last_name,w_e.role FROM entertainment e, workedine w_e, castandcrew c WHERE e.name=%s AND e.e_id=w_e.e_id AND w_e.c_id=c.c_id",name)
+  entertainment=[]
+  for result in cursor:
+    entertainment.append(result)
+  context= dict(data=entertainment,stream=name)
+  return render_template("tv_show.html",**context)
 
 @app.route('/another')
 def another():
@@ -183,11 +192,11 @@ def another():
 
 
 # Example of adding new data to the database
-@app.route('/search', methods=['POST'])
+@app.route('/search', methods=['GET'])
 def search():
-  print(request.form)
-  type_of= request.form['option']
-  name= request.form['name']
+  print(request.args)
+  type_of= request.args['option']
+  name= request.args['name']
   if type_of=='movie':
     return redirect(('movie/{}'.format(name)))
   elif type_of=='stream_plat':
@@ -200,11 +209,13 @@ def search():
   #g.conn.execute('INSERT INTO test(name) VALUES (%s)', name)
   #return redirect('/')
 
-@app.route('/login')
+@app.route('/login',methods=["GET"])
 def login():
-    abort(401)
-    this_is_never_executed()
+  return render_template("login.html")
 
+@app.route('/user_login',methods=['POST'])
+def user_login():
+  print(request.form)
 
 if __name__ == "__main__":
   import click

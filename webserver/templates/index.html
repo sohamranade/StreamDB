@@ -9,17 +9,23 @@
 
 <body>
   <h1>STREAM DB</h1>
-<form method="POST" action="/search">
-  <label for="choose_a">Search for a:</label>
-    <select name="option" id="search">
-      <option value="movie">Movie</option>
-      <option value="tv_show">Tv-Show</option>
-      <option value="artist">Artist</option>
-      <option value="stream_plat">Streaming-Platform</option>>
-    </select>
-    <input type="text" name="name"><input type="submit" value="Search">
-</form>
-
+<div>
+  <form method="GET" action="/search">
+    <label for="choose_a">Search for a:</label>
+      <select name="option" id="search">
+        <option value="movie">Movie</option>
+        <option value="tv_show">Tv-Show</option>
+        <option value="artist">Artist</option>
+        <option value="stream_plat">Streaming-Platform</option>>
+      </select>
+      <input type="text" name="name"><input type="submit" value="Search">
+  </form>
+</div>
+<div>
+  <form method="GET" action="/login">
+    <button type="submit">Login</button>
+  </form>
+</div>
 </body>
 
 
