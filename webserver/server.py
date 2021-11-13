@@ -182,7 +182,7 @@ def another():
 
 
 # Example of adding new data to the database
-@app.route('/add', methods=['POST'])
+@app.route('/search', methods=['POST'])
 def add():
   print(request.form)
   type_of= request.form['option']
