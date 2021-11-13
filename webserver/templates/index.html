@@ -8,19 +8,16 @@
 
 
 <body>
-  <h1>Some famous Computer Scientists</h1>
-  <div>{{data}}</div>
-
-  <div>
-    {% for n in data %}
-    <div>{{n}}</div>
-    {% endfor %}
-  </div>
-
-<p><a href="another">Go to the other page</a></p>
-
+  <h1>STREAM DB</h1>
 <form method="POST" action="/add">
-<p>Name of new computer scientist: <input type="text" name="name"> <input type="submit" value="Add"></p>
+  <label for="choose_a">Search for a:</label>
+    <select name="option" id="search">
+      <option value="movie">Movie</option>
+      <option value="tv_show">Tv-Show</option>
+      <option value="artist">Artist</option>
+      <option value="stream_plat">Streaming-Platform</option>>
+    </select>
+    <input type="text" name="name"><input type="submit" value="Search">
 </form>
 
 </body>

@@ -29,7 +29,7 @@ app = Flask(__name__, template_folder=tmpl_dir)
 #
 #     DATABASEURI = "postgresql://gravano:foobar@34.74.246.148/proj1part2"
 #
-DATABASEURI = "postgresql://user:password@34.74.246.148/proj1part2"
+DATABASEURI = "postgresql://ssr2182:1364@34.74.246.148/proj1part2"
 
 
 #
@@ -104,6 +104,7 @@ def index():
 
   # DEBUG: this is debugging code to see what request looks like
   print(request.args)
+  #print(request.form)
 
 
   #
@@ -158,6 +159,23 @@ def index():
 # Notice that the function name is another() rather than index()
 # The functions for each app.route need to have different names
 #
+
+@app.route('/stream_plat/<name>')
+def stream_plat(name):
+  return render_template("stream_plat.html")
+
+@app.route('/movie/<name>')
+def movie(name):
+  return render_template("movie.html")
+
+@app.route('/artist/<name>')
+def artist(name):
+  return render_template("artist.html")
+
+@app.route('/tv_show/<name>')
+def tv_show(name):
+  return render_template("tv_show.html")
+
 @app.route('/another')
 def another():
   return render_template("another.html")
@@ -166,10 +184,20 @@ def another():
 # Example of adding new data to the database
 @app.route('/add', methods=['POST'])
 def add():
-  name = request.form['name']
-  g.conn.execute('INSERT INTO test(name) VALUES (%s)', name)
-  return redirect('/')
-
+  print(request.form)
+  type_of= request.form['option']
+  name= request.form['name']
+  if type_of=='movie':
+    return redirect(('movie/{}'.format(name)))
+  elif type_of=='stream_plat':
+    return redirect(('stream_plat/{}'.format(name)))
+  elif type_of=='tv_show':
+    return redirect(('tv_show/{}'.format(name)))
+  elif type_of=='artist':
+    return redirect(('artist/{}'.format(name)))
+  #name = request.form['name']
+  #g.conn.execute('INSERT INTO test(name) VALUES (%s)', name)
+  #return redirect('/')
 
 @app.route('/login')
 def login():
