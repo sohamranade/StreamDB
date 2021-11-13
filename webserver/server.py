@@ -209,12 +209,12 @@ def search():
   #g.conn.execute('INSERT INTO test(name) VALUES (%s)', name)
   #return redirect('/')
 
-@app.route('/login',methods=["GET"])
+@app.route('/signup',methods=["GET"])
 def login():
-  return render_template("login.html")
+  return render_template("signup.html")
 
-@app.route('/user_login',methods=['POST'])
-def user_login():
+@app.route('/user_signup',methods=['POST'])
+def user_signup():
   print(request.form)
 
 if __name__ == "__main__":
