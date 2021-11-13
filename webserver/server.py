@@ -162,6 +162,7 @@ def index():
 
 @app.route('/stream_plat/<name>')
 def stream_plat(name):
+
   return render_template("stream_plat.html")
 
 @app.route('/movie/<name>')
@@ -183,7 +184,7 @@ def another():
 
 # Example of adding new data to the database
 @app.route('/search', methods=['POST'])
-def add():
+def search():
   print(request.form)
   type_of= request.form['option']
   name= request.form['name']
