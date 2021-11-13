@@ -166,6 +166,7 @@ def stream_plat(name):
   entertainment=[]
   for result in cursor:
     entertainment.append(result)
+  cursor.close()
   context= dict(data=entertainment,stream=name)
   return render_template("stream_plat.html", **context)
 
@@ -183,6 +184,7 @@ def tv_show(name):
   entertainment=[]
   for result in cursor:
     entertainment.append(result)
+  cursor.close()
   context= dict(data=entertainment,stream=name)
   return render_template("tv_show.html",**context)
 
@@ -215,7 +217,29 @@ def login():
 
 @app.route('/user_signup',methods=['POST'])
 def user_signup():
-  print(request.form)
+  email=request.form['email']
+  f_name=request.form['f_name']
+  l_name=request.form['l_name']
+  name= f_name+" "+ l_name
+  dob=request.form['dob']
+  password=request.form['psw']
+  cursor= g.conn.execute("SELECT * FROM users u WHERE u.email_id=%s",email)
+  row=cursor.fetchall()
+  if not row:
+    cursor1=g.conn.execute("SELECT MAX(u.u_id) FROM users u")
+    res= cursor1.fetchall()
+    u_id=res[0][0]
+    u_id+=1
+    #g.conn.execute('INSERT INTO users(u_id,email_id,name,dob,password) VALUES(%s,%s,%s,%s,%s)',(u_id,email,name,dob,password))
+    print("Successfully inserted")
+    cursor1.close()
+  else:
+    print(row)
+    print("User Repeated")
+  cursor.close()
+  return redirect('/signup')
+  
+
 
 if __name__ == "__main__":
   import click
