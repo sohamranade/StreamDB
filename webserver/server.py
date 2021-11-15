@@ -277,7 +277,7 @@ def movie(name):
 
   e_id = rows[0][0]
   
-  command = "Select E.e_id, name, rating, genre, language, description, release_year, running_time" 
+  command = "Select E.e_id, E.name, rating, genre, language, description, release_year, running_time" 
   command+= " From Movies M, Entertainment E "
   command+= "Where M.e_id = E.e_id and M.e_id = " + str(e_id)
 
@@ -287,25 +287,19 @@ def movie(name):
     rows.append(list(result))
 
   cursor.close()
-  print("Movie information: ")
-  print(rows)
-  print()
   #print("#########################################")
-
   command = "Select C.first_name, C.last_name, W.role From WorkedInM W, CastAndCrew C Where W.c_id = C.c_id and W.e_id = "
   command += str(e_id)
 
   cursor = g.conn.execute(command)
-  rows = []
+  rows1 = []
   for result in cursor:
-    rows.append(list(result))
-
+    rows1.append(list(result))
   cursor.close()
-  print("Cast and Crew: ")
-  print(rows)
 
+  context=dict(stream=name,data=rows, artist_data=rows1)
+  return render_template("movie.html", **context)
 
-  return render_template("movie.html")
 
 @app.route('/artist/<name>')
 def artist(name):
@@ -323,17 +317,22 @@ def artist(name):
   command = "Select W.role, E.name From WorkedInM W, Entertainment E Where W.e_id = E.e_id and W.c_id = " + str(c_id) 
   
   cursor = g.conn.execute(command)
-  rows = []
+  rows1 = []
   for result in cursor:
-    rows.append(list(result))
+    rows1.append(list(result))
 
   cursor.close()
-  print("Worked in: ")
-  print(rows)
-  print()
-  #print("#########################################")
 
-  return render_template("artist.html")
+  command = "Select DISTINCT W.role, E.name From WorkedInE W, Entertainment E Where W.e_id = E.e_id and W.c_id = " + str(c_id) 
+  
+  cursor = g.conn.execute(command)
+  for result in cursor:
+    rows1.append(list(result))
+
+  cursor.close()
+  #print("#########################################")
+  context=dict(stream=name, artist_data=rows, data=rows1)
+  return render_template("artist.html", **context)
 
 @app.route('/tv_show/<name>')
 def tv_show(name):
@@ -344,10 +343,6 @@ def tv_show(name):
   cursor.close()
   context= dict(data=entertainment,stream=name)
   return render_template("tv_show.html",**context)
-
-@app.route('/another')
-def another():
-  return render_template("another.html")
 
 
 # Simple search bar
@@ -442,8 +437,15 @@ def user_review():
     return redirect("user/{}".format(u_id))
   else:
     e_id=rows[0][0]
-    g.conn.execute("INSERT into review VALUES (%s,%s,%s,%s)",(u_id,e_id,rating,review))
-    print("Sucessfully Inserted")
+    cursor= g.conn.execute("SELECT * from review r WHERE r.u_id=%s and r.e_id=%s",(u_id,e_id))
+    rows1=cursor.fetchall()
+    cursor.close()
+    if not rows1:
+      g.conn.execute("INSERT into review VALUES (%s,%s,%s,%s)",(u_id,e_id,rating,review))
+      print("Sucessfully Inserted")
+    else:
+      print("Successfully updated")
+      g.conn.execute("UPDATE review SET rating=%s, review=%s WHERE e_id=%s AND u_id=%s",(rating,review,e_id,u_id))
     return redirect("user/{}".format(u_id))
 
 
