@@ -170,12 +170,170 @@ def stream_plat(name):
   context= dict(data=entertainment,stream=name)
   return render_template("stream_plat.html", **context)
 
+@app.route('/best_platform')
+def best_platform():
+
+
+  #add toggle for all results/top result and for bang for buck/absolute number
+  category = "artist" #can be artist, genre, language, rating (threshold 4)
+  name = "Tom Cruise"
+  
+  category = "language"
+  name = "Marathi"
+  T= ""
+
+  if category=="artist":
+    fname, lname = name.split()
+
+    T = "Select distinct e_id from workedinM W, CastAndCrew C where W.c_id = C.c_id and C.first_name = '" 
+    T += fname + "' and C.last_name = '" + lname + "' "  
+  
+  elif category == "genre":
+    genre = name
+    T = "Select distinct e_id from Entertainment Where genre = '" + genre + "' "
+  
+  elif category == "language":
+    language = name
+    T = "Select distinct e_id from Entertainment Where language = '" + language + "' "
+
+  command = "Select name, count(e_id) From IsOn Where e_id in (" + T + ") "
+  command+= "Group by name "
+  command+= "order by count(e_id) desc"
+  cursor = g.conn.execute(command)
+
+  for result in cursor:
+    print(list(result))
+  
+  cursor.close()
+
+  return render_template("movie_search.html")  
+
+
+@app.route('/movie_search')
+def movie_search():
+  
+  name = "Top Gun"
+  artist = "Tom Cruise"
+  language = "English"
+  platform = ""
+  genre = ""
+
+  sort_by_rating = "asc" #can be asc, desc, none ("")
+
+  command = "Select E.e_id, name, rating, genre, language, release_year, running_time" 
+  command+= " From Movies M, Entertainment E "
+
+  where_part = "Where M.e_id = E.e_id"
+
+  if(len(name) >0):
+    where_part += " and E.name = '" + name + "'"
+  
+  if(len(language) >0):
+    where_part += " and E.language = '" + language + "'"
+  
+  if(len(genre) >0):
+    where_part += " and E.genre = '" + genre + "'"
+
+  comm2 = ""
+  comm3 = ""
+
+  if len(artist)>0:
+    fname, lname = artist.split()   #handle error where not 2 values to unpack
+    comm2 = "Select e_id From WorkedInM W, CastAndCrew C Where W.c_id = C.c_id and C.first_name = '" 
+    comm2 += fname + "' and C.last_name = '" + lname + "'"
+
+  if len(platform)>0:
+    comm3 = "Select e_id from IsOn Where name = '" + platform + "'"
+
+  if len(comm2) > 0:
+    where_part += " and M.e_id in (" + comm2 + ") "
+  
+  if len(comm3) > 0:
+    where_part += " and M.e_id in (" + comm3 + ") "
+
+  command += where_part
+
+  if sort_by_rating == 'asc':
+    command += " order by Rating ASC"
+  
+  if sort_by_rating == 'desc':
+    command += " order by Rating DESC"
+    
+  cursor = g.conn.execute(command)
+  
+  for result in cursor:
+    print(list(result))
+  
+  cursor.close()
+  return render_template("movie_search.html")
+
 @app.route('/movie/<name>')
 def movie(name):
+  
+  cursor = g.conn.execute("Select e_id from Entertainment where name = '" + name + "'")
+  rows = []
+  for result in cursor:
+    rows.append(list(result))  # can also be accessed using result[0]
+  cursor.close()
+
+  e_id = rows[0][0]
+  
+  command = "Select E.e_id, name, rating, genre, language, description, release_year, running_time" 
+  command+= " From Movies M, Entertainment E "
+  command+= "Where M.e_id = E.e_id and M.e_id = " + str(e_id)
+
+  cursor = g.conn.execute(command)
+  rows = []
+  for result in cursor:
+    rows.append(list(result))
+
+  cursor.close()
+  print("Movie information: ")
+  print(rows)
+  print()
+  #print("#########################################")
+
+  command = "Select C.first_name, C.last_name, W.role From WorkedInM W, CastAndCrew C Where W.c_id = C.c_id and W.e_id = "
+  command += str(e_id)
+
+  cursor = g.conn.execute(command)
+  rows = []
+  for result in cursor:
+    rows.append(list(result))
+
+  cursor.close()
+  print("Cast and Crew: ")
+  print(rows)
+
+
   return render_template("movie.html")
 
 @app.route('/artist/<name>')
 def artist(name):
+
+  f_name, l_name = name.split(' ')
+  command = "Select c_id from CastAndCrew Where first_name = '" + f_name + "' and last_name = '" + l_name + "'"
+  cursor = g.conn.execute(command)
+  rows = []
+  for result in cursor:
+    rows.append(list(result))  # can also be accessed using result[0]
+  cursor.close()
+
+  c_id = rows[0][0]
+  
+  command = "Select W.role, E.name From WorkedInM W, Entertainment E Where W.e_id = E.e_id and W.c_id = " + str(c_id) 
+  
+  cursor = g.conn.execute(command)
+  rows = []
+  for result in cursor:
+    rows.append(list(result))
+
+  cursor.close()
+  print("Worked in: ")
+  print(rows)
+  print()
+  #print("#########################################")
+
   return render_template("artist.html")
 
 @app.route('/tv_show/<name>')
@@ -288,9 +446,6 @@ def user_review():
     g.conn.execute("INSERT into review VALUES (%s,%s,%s,%s)",(u_id,e_id,rating,review))
     print("Sucessfully Inserted")
     return redirect("user/{}".format(u_id))
-
-
-
 
 
 
