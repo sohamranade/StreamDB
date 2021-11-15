@@ -1,0 +1,36 @@
+<html>
+    <style>
+    body{ 
+        font-size: 15pt;
+        font-family: arial;
+    }
+    </style>
+
+
+    <body>
+    <h1>{{name}}</h1>
+    <div>
+    <form method="POST" action="/rating_review">
+        <label for= "u_id">u_id</label>
+        <input type="text" name="u_id" id="u_id">
+        <label for="name">Review for:</label>
+        <input type="text" name="name" id="name">
+    </div>
+    <div>
+        <label for="rating">Rating</label>
+        <select name="rating" id="rating">
+            <option value=1>1</option>
+            <option value=2>2</option>
+            <option value=3>3</option>
+            <option value=4>4</option>
+            <option value=5>5</option>
+        </select>
+    </div>
+    <div>
+        <label for="review">Review</label>
+        <textarea rows="5" cols="50" name= "review" id="review"></textarea>
+    </div>
+        <input type="submit" value="submit">
+    </form>
+    </body>
+</html>

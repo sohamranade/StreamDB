@@ -159,7 +159,7 @@ def index():
 # Notice that the function name is another() rather than index()
 # The functions for each app.route need to have different names
 #
-
+# for Showing specific pages
 @app.route('/stream_plat/<name>')
 def stream_plat(name):
   cursor = g.conn.execute("SELECT e.name,e.genre, e.language,e.description FROM streamingplatform s, ison i,entertainment e WHERE s.name=%s AND s.name=i.name AND i.e_id=e.e_id",name)
@@ -193,7 +193,7 @@ def another():
   return render_template("another.html")
 
 
-# Example of adding new data to the database
+# Simple search bar
 @app.route('/search', methods=['GET'])
 def search():
   print(request.args)
@@ -211,8 +211,13 @@ def search():
   #g.conn.execute('INSERT INTO test(name) VALUES (%s)', name)
   #return redirect('/')
 
+
+
+
+
+#Everything related to logins and Signups.
 @app.route('/signup',methods=["GET"])
-def login():
+def signup():
   return render_template("signup.html")
 
 @app.route('/user_signup',methods=['POST'])
@@ -239,6 +244,54 @@ def user_signup():
   cursor.close()
   return redirect('/signup')
   
+@app.route('/login',methods=["GET"])
+def login():
+  return render_template("login.html")
+
+@app.route('/user_login',methods=["POST"])
+def user_login():
+  email=request.form['email']
+  password=request.form['psw']
+  cursor= g.conn.execute("SELECT u.u_id FROM users u WHERE u.email_id=%s and u.password=%s",(email,password))
+  rows=cursor.fetchall()
+  if not rows:
+    print("Login Failed, Please check the login details")
+    cursor.close()
+    return render_template("login.html")
+  else:
+    u_id=rows[0][0]
+    cursor.close()
+    return redirect(('user/{}'.format(u_id)))
+
+@app.route('/user/<u_id>')
+def user(u_id):
+  cursor= g.conn.execute("SELECT u.name FROM users u where u.u_id=%s",u_id)
+  row=cursor.fetchall()
+  name=row[0][0]
+  context=dict(name=name)
+  return render_template("user.html",**context)
+
+@app.route('/rating_review',methods=["POST"])
+def user_review():
+  u_id= int(request.form['u_id'])
+  name=request.form['name']
+  rating=int(request.form['rating'])
+  review= request.form['review']
+  cursor= g.conn.execute("SELECT * from entertainment e where e.name=%s",name)
+  rows=cursor.fetchall()
+  cursor.close()
+  if not rows:
+    print(f"{name} doesnt exist in the database")
+    return redirect("user/{}".format(u_id))
+  else:
+    e_id=rows[0][0]
+    g.conn.execute("INSERT into review VALUES (%s,%s,%s,%s)",(u_id,e_id,rating,review))
+    print("Sucessfully Inserted")
+    return redirect("user/{}".format(u_id))
+
+
+
+
 
 
 if __name__ == "__main__":
