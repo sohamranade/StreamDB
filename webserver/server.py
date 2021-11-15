@@ -460,12 +460,14 @@ def user_review():
       g.conn.execute("UPDATE entertainment SET rating=%s, no_ratings=%s WHERE e_id=%s ",(rate,n_rate,e_id))
       '''
     else:
+      '''
       cursor=g.conn.execute("SELECT e.rating,e.no_ratings, r.rating FROM entertainment e,review r WHERE e.e_id=%s,r.e_id=e.e_id and r.u_id=%s",(e_id,u_id))
       rows=cursor.fetchall()
       cursor.close()
       rate, n_rate, u_rate= rows[0]
       rate= (rate*n_rate - u_rate + rating)/n_rate
       g.conn.execute("UPDATE entertainment SET rating=%s, no_ratings=%s WHERE e_id=%s ",(rate,n_rate,e_id))
+      '''
       print("Successfully updated")
       g.conn.execute("UPDATE review SET rating=%s, review=%s WHERE e_id=%s AND u_id=%s",(rating,review,e_id,u_id))
     return redirect("user/{}".format(u_id))
