@@ -175,11 +175,11 @@ def best_platform():
 
 
   #add toggle for all results/top result and for bang for buck/absolute number
-  category = "artist" #can be artist, genre, language, rating (threshold 4)
-  name = "Tom Cruise"
+  #category = "artist" #can be artist, genre, language, rating (threshold 4)
+  #name = "Tom Cruise"
+  name = request.args['name']
+  category = request.args['category']
   
-  category = "language"
-  name = "Marathi"
   T= ""
 
   if category=="artist":
@@ -212,12 +212,11 @@ def best_platform():
 @app.route('/movie_search')
 def movie_search():
   
-  name = "Top Gun"
-  artist = "Tom Cruise"
-  language = "English"
-  platform = ""
-  genre = ""
-
+  name = request.args['name']
+  artist = request.args['artist']
+  language = request.args['language']
+  platform = request.args['platform']
+  genre = request.args['genre']
   sort_by_rating = "asc" #can be asc, desc, none ("")
 
   command = "Select E.e_id, name, rating, genre, language, release_year, running_time" 
