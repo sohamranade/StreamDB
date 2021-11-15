@@ -201,12 +201,15 @@ def best_platform():
   command+= "order by count(e_id) desc"
   cursor = g.conn.execute(command)
 
+  rows=[]
   for result in cursor:
+    rows.append(list(result))
     print(list(result))
   
   cursor.close()
 
-  return render_template("movie_search.html")  
+  context=dict(data=rows)
+  return render_template("best_platform.html", **context)  
 
 
 @app.route('/movie_search')
@@ -219,7 +222,7 @@ def movie_search():
   genre = request.args['genre']
   sort_by_rating = "asc" #can be asc, desc, none ("")
 
-  command = "Select E.e_id, name, rating, genre, language, release_year, running_time" 
+  command = "Select name, rating, genre, language, release_year, running_time" 
   command+= " From Movies M, Entertainment E "
 
   where_part = "Where M.e_id = E.e_id"
@@ -260,11 +263,15 @@ def movie_search():
     
   cursor = g.conn.execute(command)
   
+  rows = []
   for result in cursor:
+    rows.append(list(result))
     print(list(result))
-  
   cursor.close()
-  return render_template("movie_search.html")
+
+  context=dict(data=rows)
+  return render_template("movie_search.html", **context)
+  #return render_template("movie_search.html")
 
 @app.route('/movie/<name>')
 def movie(name):
