@@ -343,12 +343,13 @@ def artist(name):
 
 @app.route('/tv_show/<name>')
 def tv_show(name):
-  cursor = g.conn.execute("SELECT DISTINCT e.name,e.genre, e.language,e.description, c.first_name,c.last_name,w_e.role FROM entertainment e, workedine w_e, castandcrew c WHERE e.name=%s AND e.e_id=w_e.e_id AND w_e.c_id=c.c_id",name)
-  entertainment=[]
-  for result in cursor:
-    entertainment.append(result)
+  cursor = g.conn.execute("SELECT e.name,e.genre, e.language,e.description, t.n_seasons FROM entertainment e, tvshows t WHERE e.name=%s AND e.e_id=t.e_id",name)
+  entertainment=cursor.fetchall()
   cursor.close()
-  context= dict(data=entertainment,stream=name)
+  cursor= g.conn.execute("SELECT DISTINCT c.first_name, c.last_name,w_e.role FROM castandcrew c, workedine w_e, entertainment e WHERE e.name=%s AND e.e_id= w_e.e_id AND w_e.c_id=c.c_id",name)
+  artist= cursor.fetchall()
+  cursor.close()
+  context= dict(data=entertainment,stream=name, artist_data=artist)
   return render_template("tv_show.html",**context)
 
 
@@ -426,8 +427,17 @@ def user_login():
 def user(u_id):
   cursor= g.conn.execute("SELECT u.name FROM users u where u.u_id=%s",u_id)
   row=cursor.fetchall()
+  cursor.close()
   name=row[0][0]
-  context=dict(name=name)
+  cursor= g.conn.execute("SELECT a.name FROM users u,hasaccessto a WHERE u.u_id=%s AND u.u_id=a.u_id",u_id)
+  row=cursor.fetchall()
+  streaming_site=row[0][0]
+  cursor.close()
+  cursor= g.conn.execute("SELECT e.name,r.rating, r.review FROM review r, entertainment e WHERE r.u_id=%s AND r.e_id=e.e_id",u_id)
+  row=cursor.fetchall()
+  cursor.close()
+
+  context=dict(name=name, stream_site=streaming_site, rate=row)
   return render_template("user.html",**context)
 
 @app.route('/rating_review',methods=["POST"])

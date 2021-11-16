@@ -32,5 +32,12 @@
     </div>
         <input type="submit" value="submit">
     </form>
+    <div>Your current subscription: {{stream_site}}</div>
+    <div>Your recent ratings and Reviews:</div>
+    <div>
+        {% for n in rate %}
+        <div>{{n}}</div>
+        {% endfor %}
+    </div>
     </body>
 </html>
