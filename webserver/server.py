@@ -146,16 +146,33 @@ def index():
     print(list(result))
   cursor.close()
 
-  context=dict(rated_movies=highest_rated_movies, rated_tvshows = highest_rated_tv_shows, grossing_movies = highest_grossing_movies)
+  #Highest lifetime movie earnings for actor:
 
+  command = "SELECT CONCAT(TRIM(c.first_name),' ',TRIM( c.last_name)) as name, T.num as number_of_movies "
+  command+= "FROM castandcrew c, ( "
+  command+= "SELECT w.c_id, count(DISTINCT w.e_id) as num "
+  command+= "FROM  workedinm w " 
+  command+= "GROUP BY w.c_id) as T "
+  command+= "WHERE c.c_id = T.c_id "
+  command+= "order by T.num desc limit 3"
 
-  #Most prolific artist
+  cursor = g.conn.execute(command)
+  
+  most_prolif_artists = []
+  for result in cursor:
+    most_prolif_artists.append(list(result))
+    print(list(result))
+  cursor.close()
 
-
+  context=dict(rated_movies=highest_rated_movies, rated_tvshows = highest_rated_tv_shows, \
+               grossing_movies = highest_grossing_movies, prolific_actors = most_prolif_artists)
 
   #Highest grossing actor
-
-
+  '''
+  select  
+  from castandcrew c, movies m, workedinm w where c.c_id = w.c_id and m.e_id = w.e_id
+  group by c.c_id
+  '''
   #print(request.form)
 
 
