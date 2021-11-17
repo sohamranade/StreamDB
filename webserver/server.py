@@ -103,7 +103,6 @@ def index():
   """
 
   # DEBUG: this is debugging code to see what request looks like
-  print(request.args)
   #print(request.form)
 
 
@@ -460,7 +459,6 @@ def user_review():
     if not rows1:
       g.conn.execute("INSERT into review VALUES (%s,%s,%s,%s)",(u_id,e_id,rating,review))
       print("Sucessfully Inserted")
-      '''
       cursor=g.conn.execute("SELECT e.rating,e.no_ratings FROM entertainment e WHERE e.e_id=%s",(e_id))
       res=cursor.fetchall()
       cursor.close()
@@ -468,16 +466,13 @@ def user_review():
       rate= ((rate*n_rate) + rating)/(n_rate+1)
       n_rate+=1
       g.conn.execute("UPDATE entertainment SET rating=%s, no_ratings=%s WHERE e_id=%s ",(rate,n_rate,e_id))
-      '''
     else:
-      '''
-      cursor=g.conn.execute("SELECT e.rating,e.no_ratings, r.rating FROM entertainment e,review r WHERE e.e_id=%s,r.e_id=e.e_id and r.u_id=%s",(e_id,u_id))
+      cursor=g.conn.execute("SELECT e.rating,e.no_ratings, r.rating FROM entertainment e,review r WHERE e.e_id=%s AND r.e_id=e.e_id AND r.u_id=%s",(e_id,u_id))
       rows=cursor.fetchall()
       cursor.close()
       rate, n_rate, u_rate= rows[0]
       rate= (rate*n_rate - u_rate + rating)/n_rate
       g.conn.execute("UPDATE entertainment SET rating=%s, no_ratings=%s WHERE e_id=%s ",(rate,n_rate,e_id))
-      '''
       print("Successfully updated")
       g.conn.execute("UPDATE review SET rating=%s, review=%s WHERE e_id=%s AND u_id=%s",(rating,review,e_id,u_id))
     return redirect("user/{}".format(u_id))
