@@ -54,12 +54,18 @@
         <option value="Romance">Romance</option>>
       </select>
 
-      <select name="sort_by_rating">
-        <option value="">Order by rating?</option>
-        <option value="asc">Ascending</option>
-        <option value="desc">Descending</option>
+      <select name="sort_by">
+        <option value="">Order by?</option>
+        <option value="rating">ratings</option>
+        <option value="earnings">earnings</option>
       </select>
-
+    
+      <select name="order_type">
+        <option value="">Order</option>
+        <option value="ASC">Ascending</option>
+        <option value="DESC">Descending</option>
+      </select>
+      
       <input type="submit" value="Search">
   </form>
 </div>
@@ -69,7 +75,7 @@
   <form method="GET" action="/tvshow_search">
     <label for="choose_a">Search TV Shows:</label>
       
-      <input type="text" placeholder="Enter Movie name" name="name">
+      <input type="text" placeholder="Enter TVshow name" name="name">
       <input type="text" placeholder="Enter Artist Name" name="artist">
       <input type="text" placeholder="Enter Language" name="language">
 

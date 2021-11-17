@@ -272,9 +272,9 @@ def movie_search():
   language = request.args['language']
   platform = request.args['platform']
   genre = request.args['genre']
-  sort_by_rating = "asc" #can be asc, desc, none ("")
-
-  command = "Select name, rating, genre, language, release_year, running_time" 
+  sort_by = request.args['sort_by'] #can be asc, desc, none ("")
+  order_by= request.args['order_type']
+  command = "Select name, rating, genre, language, release_year, running_time, earnings" 
   command+= " From Movies M, Entertainment E "
 
   where_part = "Where M.e_id = E.e_id"
@@ -306,13 +306,14 @@ def movie_search():
     where_part += " and M.e_id in (" + comm3 + ") "
 
   command += where_part
-
-  if sort_by_rating == 'asc':
-    command += " order by Rating ASC"
-  
-  if sort_by_rating == 'desc':
-    command += " order by Rating DESC"
-    
+  command+= " order by " + sort_by #order by clause
+  command+= " " + order_by
+  #if sort_by_rating == 'asc':
+  #  command += " order by Rating ASC"
+  #
+  #if sort_by_rating == 'desc':
+  #  command += " order by Rating DESC"
+  #  
   cursor = g.conn.execute(command)
   
   rows = []
@@ -397,9 +398,9 @@ def movie(name):
 
   e_id = rows[0][0]
   
-  command = "Select E.e_id, E.name, rating, genre, language, description, release_year, running_time" 
-  command+= " From Movies M, Entertainment E "
-  command+= "Where M.e_id = E.e_id and M.e_id = " + str(e_id)
+  command = "Select E.e_id, E.name, rating, genre, language, description, release_year, running_time, I.name" 
+  command+= " From Movies M, Entertainment E, ison I "
+  command+= "Where M.e_id = E.e_id and I.e_id= E.e_id and M.e_id = " + str(e_id)
 
   cursor = g.conn.execute(command)
   rows = []
@@ -456,20 +457,23 @@ def artist(name):
 
 @app.route('/tv_show/<name>')
 def tv_show(name):
-  cursor = g.conn.execute("SELECT e.name,e.genre, e.language,e.description, t.n_seasons FROM entertainment e, tvshows t WHERE e.name=%s AND e.e_id=t.e_id",name)
+  cursor = g.conn.execute("SELECT e.e_id,e.name,e.genre, e.language,e.description, t.n_seasons FROM entertainment e, tvshows t WHERE e.name=%s AND e.e_id=t.e_id",name)
   entertainment=cursor.fetchall()
+  e_id=entertainment[0][0]
   cursor.close()
   cursor= g.conn.execute("SELECT DISTINCT c.first_name, c.last_name,w_e.role FROM castandcrew c, workedine w_e, entertainment e WHERE e.name=%s AND e.e_id= w_e.e_id AND w_e.c_id=c.c_id",name)
   artist= cursor.fetchall()
   cursor.close()
-  context= dict(data=entertainment,stream=name, artist_data=artist)
+  cursor= g.conn.execute("SELECT e.s_no, e.e_no, e.title FROM episodes e WHERE e.e_id=%s",e_id)
+  episodes= cursor.fetchall()
+  cursor.close()
+  context= dict(data=entertainment,stream=name, artist_data=artist, episode_data=episodes)
   return render_template("tv_show.html",**context)
 
 
 # Simple search bar
 @app.route('/search', methods=['GET'])
 def search():
-  print(request.args)
   type_of= request.args['option']
   name= request.args['name']
   if type_of=='movie':
@@ -508,11 +512,10 @@ def user_signup():
     res= cursor1.fetchall()
     u_id=res[0][0]
     u_id+=1
-    #g.conn.execute('INSERT INTO users(u_id,email_id,name,dob,password) VALUES(%s,%s,%s,%s,%s)',(u_id,email,name,dob,password))
+    g.conn.execute('INSERT INTO users(u_id,email_id,name,dob,password) VALUES(%s,%s,%s,%s,%s)',(u_id,email,name,dob,password))
     print("Successfully inserted")
     cursor1.close()
   else:
-    print(row)
     print("User Repeated")
   cursor.close()
   return redirect('/signup')
