@@ -167,52 +167,6 @@ def index():
   context=dict(rated_movies=highest_rated_movies, rated_tvshows = highest_rated_tv_shows, \
                grossing_movies = highest_grossing_movies, prolific_actors = most_prolif_artists)
 
-  #Highest grossing actor
-  '''
-  select  
-  from castandcrew c, movies m, workedinm w where c.c_id = w.c_id and m.e_id = w.e_id
-  group by c.c_id
-  '''
-  #print(request.form)
-
-
-  #
-  # example of a database query
-  #
-  #cursor = g.conn.execute("SELECT s.name, s.subscription_cost FROM streamingplatform WHERE s.name=name")
-  #names = []
-  #for result in cursor:
-  #  names.append(result['name'])  # can also be accessed using result[0]
-  #cursor.close()
-
-  #
-  # Flask uses Jinja templates, which is an extension to HTML where you can
-  # pass data to a template and dynamically generate HTML based on the data
-  # (you can think of it as simple PHP)
-  # documentation: https://realpython.com/primer-on-jinja-templating/
-  #
-  # You can see an example template in templates/index.html
-  #
-  # context are the variables that are passed to the template.
-  # for example, "data" key in the context variable defined below will be 
-  # accessible as a variable in index.html:
-  #
-  #     # will print: [u'grace hopper', u'alan turing', u'ada lovelace']
-  #     <div>{{data}}</div>
-  #     
-  #     # creates a <div> tag for each element in data
-  #     # will print: 
-  #     #
-  #     #   <div>grace hopper</div>
-  #     #   <div>alan turing</div>
-  #     #   <div>ada lovelace</div>
-  #     #
-  #     {% for n in data %}
-  #     <div>{{n}}</div>
-  #     {% endfor %}
-  #
-  #context = dict(data = names)
-
 
   #
   # render_template looks in the templates/ folder for files.
@@ -220,15 +174,6 @@ def index():
   #
   return render_template("index.html", **context)
 
-#
-# This is an example of a different path.  You can see it at:
-# 
-#     localhost:8111/another
-#
-# Notice that the function name is another() rather than index()
-# The functions for each app.route need to have different names
-#
-# for Showing specific pages
 @app.route('/stream_plat/<name>')
 def stream_plat(name):
   cursor = g.conn.execute("SELECT e.name,e.genre, e.language,e.description FROM streamingplatform s, ison i,entertainment e WHERE s.name=%s AND s.name=i.name AND i.e_id=e.e_id",name)
@@ -242,10 +187,6 @@ def stream_plat(name):
 @app.route('/best_platform')
 def best_platform():
 
-
-  #add toggle for all results/top result and for bang for buck/absolute number
-  #category = "artist" #can be artist, genre, language, rating (threshold 4)
-  #name = "Tom Cruise"
   name = request.args['name']
   category = request.args['category']
   
@@ -325,12 +266,7 @@ def movie_search():
   command += where_part
   command+= " order by " + sort_by #order by clause
   command+= " " + order_by
-  #if sort_by_rating == 'asc':
-  #  command += " order by Rating ASC"
-  #
-  #if sort_by_rating == 'desc':
-  #  command += " order by Rating DESC"
-  #  
+   
   cursor = g.conn.execute(command)
   
   rows = []
@@ -425,7 +361,6 @@ def movie(name):
     rows.append(list(result))
 
   cursor.close()
-  #print("#########################################")
   command = "Select C.first_name, C.last_name, W.role From WorkedInM W, CastAndCrew C Where W.c_id = C.c_id and W.e_id = "
   command += str(e_id)
 
@@ -468,7 +403,6 @@ def artist(name):
     rows1.append(list(result))
 
   cursor.close()
-  #print("#########################################")
   context=dict(stream=name, artist_data=rows, data=rows1)
   return render_template("artist.html", **context)
 
@@ -501,11 +435,6 @@ def search():
     return redirect(('tv_show/{}'.format(name)))
   elif type_of=='artist':
     return redirect(('artist/{}'.format(name)))
-  #name = request.form['name']
-  #g.conn.execute('INSERT INTO test(name) VALUES (%s)', name)
-  #return redirect('/')
-
-
 
 
 

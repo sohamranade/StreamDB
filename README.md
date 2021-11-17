@@ -24,7 +24,7 @@
 
 ## Parts from original proposal not implemented
 
-- Merging and an or filters for complex search
+- Merging and and or filters for complex search
 
 ## New features added
 
