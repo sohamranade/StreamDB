@@ -13,7 +13,7 @@
 
 ## Web app URL
 
-- 
+- http://34.75.233.192:8111/
 
 ## Parts from original proposal implemented
 
