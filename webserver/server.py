@@ -104,6 +104,58 @@ def index():
 
   # DEBUG: this is debugging code to see what request looks like
   print(request.args)
+
+  #Highest rated movie
+  command = "Select name, rating " 
+  command+= "From Movies M, Entertainment E WHERE M.e_id = E.e_id "
+  command+= "order by rating desc limit 3"
+  cursor = g.conn.execute(command)
+  
+  highest_rated_movies = []
+  for result in cursor:
+    highest_rated_movies.append(list(result))
+    print(list(result))
+  cursor.close()
+
+  
+  #Highest rated tv show
+
+  command = "Select name, rating " 
+  command+= "From TVShows T, Entertainment E WHERE T.e_id = E.e_id "
+  command+= "order by rating desc limit 3"
+  cursor = g.conn.execute(command)
+  
+  highest_rated_tv_shows = []
+  for result in cursor:
+    highest_rated_tv_shows.append(list(result))
+    print(list(result))
+  cursor.close()
+
+
+
+  #Highest grossing movie
+
+  command = "Select name, earnings " 
+  command+= "From Movies M, Entertainment E WHERE M.e_id = E.e_id "
+  command+= "order by rating desc limit 3"
+  cursor = g.conn.execute(command)
+  
+  highest_grossing_movies = []
+  for result in cursor:
+    highest_grossing_movies.append(list(result))
+    print(list(result))
+  cursor.close()
+
+  context=dict(rated_movies=highest_rated_movies, rated_tvshows = highest_rated_tv_shows, grossing_movies = highest_grossing_movies)
+
+
+  #Most prolific artist
+
+
+
+  #Highest grossing actor
+
+
   #print(request.form)
 
 
@@ -149,7 +201,7 @@ def index():
   # render_template looks in the templates/ folder for files.
   # for example, the below file reads template/index.html
   #
-  return render_template("index.html")
+  return render_template("index.html", **context)
 
 #
 # This is an example of a different path.  You can see it at:
@@ -272,6 +324,67 @@ def movie_search():
   context=dict(data=rows)
   return render_template("movie_search.html", **context)
   #return render_template("movie_search.html")
+
+@app.route('/tvshow_search')
+def tvshow_search():
+  
+  name = request.args['name']
+  artist = request.args['artist']
+  language = request.args['language']
+  platform = request.args['platform']
+  genre = request.args['genre']
+  sort_by_rating = "asc" #can be asc, desc, none ("")
+
+  command = "Select name, rating, genre, language, n_seasons " 
+  command+= " From TvShows TV, Entertainment E "
+
+  where_part = "Where TV.e_id = E.e_id"
+
+  if(len(name) >0):
+    where_part += " and E.name = '" + name + "'"
+  
+  if(len(language) >0):
+    where_part += " and E.language = '" + language + "'"
+  
+  if(len(genre) >0):
+    where_part += " and E.genre = '" + genre + "'"
+
+  comm2 = ""
+  comm3 = ""
+
+  if len(artist)>0:
+    fname, lname = artist.split()   #handle error where not 2 values to unpack
+    comm2 = "Select e_id From WorkedInE W, CastAndCrew C Where W.c_id = C.c_id and C.first_name = '" 
+    comm2 += fname + "' and C.last_name = '" + lname + "'"
+
+  if len(platform)>0:
+    comm3 = "Select e_id from IsOn Where name = '" + platform + "'"
+
+  if len(comm2) > 0:
+    where_part += " and TV.e_id in (" + comm2 + ") "
+  
+  if len(comm3) > 0:
+    where_part += " and TV.e_id in (" + comm3 + ") "
+
+  command += where_part
+
+  if sort_by_rating == 'asc':
+    command += " order by Rating ASC"
+  
+  if sort_by_rating == 'desc':
+    command += " order by Rating DESC"
+    
+  cursor = g.conn.execute(command)
+  
+  rows = []
+  for result in cursor:
+    rows.append(list(result))
+    print(list(result))
+  cursor.close()
+
+  context=dict(data=rows)
+  return render_template("tvshow_search.html", **context)
+
 
 @app.route('/movie/<name>')
 def movie(name):
