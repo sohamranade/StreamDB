@@ -1,6 +1,6 @@
-# Fall 2021 Advanced Software Engineering Team Project
+# Fall 2021 Introduction to DAtabases Team Project
 
-## Team Akea members
+## Team members
 
 | Name              |   UNI         | Github username |
 | :---              |    :----:     |          ---:   |
