@@ -264,8 +264,11 @@ def movie_search():
     where_part += " and M.e_id in (" + comm3 + ") "
 
   command += where_part
-  command+= " order by " + sort_by #order by clause
-  command+= " " + order_by
+  if sort_by=="":
+    command=command
+  else:
+    command+= " order by " + sort_by #order by clause
+    command+= " " + order_by
    
   cursor = g.conn.execute(command)
   
