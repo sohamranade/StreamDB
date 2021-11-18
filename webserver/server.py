@@ -182,6 +182,7 @@ def stream_plat(name):
     entertainment.append(result)
   
   if(len(entertainment)==0):
+    cursor.close()
     return redirect("/")
 
   cursor.close()
@@ -385,10 +386,12 @@ def movie(name):
   for result in cursor:
     rows.append(list(result))
 
+  cursor.close()
+
   if(len(rows)==0):
     return redirect("/")
 
-  cursor.close()
+  
   command = "Select C.first_name, C.last_name, W.role From WorkedInM W, CastAndCrew C Where W.c_id = C.c_id and W.e_id = "
   command += str(e_id)
 
@@ -444,12 +447,12 @@ def artist(name):
 def tv_show(name):
   cursor = g.conn.execute("SELECT e.e_id,e.name,e.genre, e.language,e.description, t.n_seasons FROM entertainment e, tvshows t WHERE e.name=%s AND e.e_id=t.e_id",name)
   entertainment=cursor.fetchall()
-  
+  cursor.close()
   if(len(entertainment)==0):
     return redirect("/")
 
   e_id=entertainment[0][0]
-  cursor.close()
+  
   cursor= g.conn.execute("SELECT DISTINCT c.first_name, c.last_name,w_e.role FROM castandcrew c, workedine w_e, entertainment e WHERE e.name=%s AND e.e_id= w_e.e_id AND w_e.c_id=c.c_id",name)
   artist= cursor.fetchall()
   cursor.close()
