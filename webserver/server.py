@@ -180,6 +180,10 @@ def stream_plat(name):
   entertainment=[]
   for result in cursor:
     entertainment.append(result)
+  
+  if(len(entertainment)==0):
+    return redirect("/")
+
   cursor.close()
   context= dict(data=entertainment,stream=name)
   return render_template("stream_plat.html", **context)
@@ -250,7 +254,11 @@ def movie_search():
   comm3 = ""
 
   if len(artist)>0:
-    fname, lname = artist.split()   #handle error where not 2 values to unpack
+    names = artist.split()
+    if(len(names)!=2):
+      return redirect("/")
+
+    fname, lname =  names   #handle error where not 2 values to unpack
     comm2 = "Select e_id From WorkedInM W, CastAndCrew C Where W.c_id = C.c_id and C.first_name = '" 
     comm2 += fname + "' and C.last_name = '" + lname + "'"
 
@@ -313,7 +321,12 @@ def tvshow_search():
   comm3 = ""
 
   if len(artist)>0:
-    fname, lname = artist.split()   #handle error where not 2 values to unpack
+
+    names = artist.split()
+    if(len(names)!=2):
+      return redirect("/")
+
+    fname, lname =  names  #handle error where not 2 values to unpack
     comm2 = "Select e_id From WorkedInE W, CastAndCrew C Where W.c_id = C.c_id and C.first_name = '" 
     comm2 += fname + "' and C.last_name = '" + lname + "'"
 
@@ -392,7 +405,10 @@ def movie(name):
 @app.route('/artist/<name>')
 def artist(name):
 
-  f_name, l_name = name.split(' ')
+  names = name.split(' ')
+  if(len(names)!=2):
+    return redirect("/")
+  f_name, l_name = names
   command = "Select c_id from CastAndCrew Where first_name = '" + f_name + "' and last_name = '" + l_name + "'"
   cursor = g.conn.execute(command)
   rows = []
