@@ -1,4 +1,4 @@
-# Fall 2021 Introduction to DAtabases Team Project
+# Fall 2021 Introduction to Databases Team Project
 
 ## Team members
 
