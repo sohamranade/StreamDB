@@ -275,6 +275,9 @@ def movie_search():
     print(list(result))
   cursor.close()
 
+  if(len(rows)==0):
+    return redirect("/")
+
   context=dict(data=rows)
   return render_template("movie_search.html", **context)
   #return render_template("movie_search.html")
@@ -336,6 +339,9 @@ def tvshow_search():
     print(list(result))
   cursor.close()
 
+  if(len(rows)==0):
+    return redirect("/")
+
   context=dict(data=rows)
   return render_template("tvshow_search.html", **context)
 
@@ -349,6 +355,9 @@ def movie(name):
     rows.append(list(result))  # can also be accessed using result[0]
   cursor.close()
 
+  if(len(rows)==0):
+    return redirect("/")
+
   e_id = rows[0][0]
   
   command = "Select E.e_id, E.name, rating, genre, language, description, release_year, running_time, I.name" 
@@ -359,6 +368,9 @@ def movie(name):
   rows = []
   for result in cursor:
     rows.append(list(result))
+
+  if(len(rows)==0):
+    return redirect("/")
 
   cursor.close()
   command = "Select C.first_name, C.last_name, W.role From WorkedInM W, CastAndCrew C Where W.c_id = C.c_id and W.e_id = "
@@ -385,6 +397,9 @@ def artist(name):
     rows.append(list(result))  # can also be accessed using result[0]
   cursor.close()
 
+  if(len(rows)==0):
+    return redirect("/")
+
   c_id = rows[0][0]
   
   command = "Select W.role, E.name From WorkedInM W, Entertainment E Where W.e_id = E.e_id and W.c_id = " + str(c_id) 
@@ -410,6 +425,10 @@ def artist(name):
 def tv_show(name):
   cursor = g.conn.execute("SELECT e.e_id,e.name,e.genre, e.language,e.description, t.n_seasons FROM entertainment e, tvshows t WHERE e.name=%s AND e.e_id=t.e_id",name)
   entertainment=cursor.fetchall()
+  
+  if(len(entertainment)==0):
+    return redirect("/")
+
   e_id=entertainment[0][0]
   cursor.close()
   cursor= g.conn.execute("SELECT DISTINCT c.first_name, c.last_name,w_e.role FROM castandcrew c, workedine w_e, entertainment e WHERE e.name=%s AND e.e_id= w_e.e_id AND w_e.c_id=c.c_id",name)
