@@ -1,4 +1,4 @@
-# Fall 2021 Introduction to Databases Team Project
+# StreamDB- Fall 2021 databases project.
 
 ## Team members
 
